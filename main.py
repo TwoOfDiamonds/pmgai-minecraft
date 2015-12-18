@@ -29,17 +29,24 @@ class DistanceField(object):
         x and z (int) are the lattitude and logitude in the map. 
         """ 
 
+        z = math.fmod(z,13)
+        x = math.fmod(x,43)
+
         # Add simple noise to the coordinates to make it less rigid!
         nx = x + 2*math.sin(z/4.7)
         nz = z + 2*math.cos(x/5.9)
         ny = y + math.sin(0.75 + x/7.8 + z/9.1)
 
         # Manhattan distance field to center of map: floating iceberg.
-        if abs(nx) + abs(nz) + abs(ny*8) < 64:
+        # if abs(nx) + abs(nz) + abs(ny*8) < 64:
+        if math.sqrt(nx*nx + nz*nz +ny*ny*64) < 64:
+            return c.MAT_DIRT
+
+        if y == 0:
             return c.MAT_SNOW
 
         # Anything that's not solid but under the sea level?
-        if y < 0:
+        if y < -1:
             return c.MAT_WATER
 
         return c.MAT_AIR
@@ -70,8 +77,8 @@ def generate():
     start_time = time.clock()
     island = saveutils.createWorld("nuclai.world")
 
-    worldsizex = 8
-    worldsizez = 8
+    worldsizex = 4
+    worldsizez = 4
 
     pipeline = DistanceField()
 
